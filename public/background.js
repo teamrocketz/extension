@@ -1,73 +1,30 @@
 console.log('hello planet, from background script');
-const tabs = chrome.tabs;
-const storage = chrome.storage.local;
-const history = chrome.history;
 
-// A new URL has loaded in a tab
-tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+// handles url's from navigating within a site
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url && !changeInfo.url.match('chrome\:\/\/')) {
+    console.log(changeInfo.url);
+    console.log(tab.title);
 
-    setTimeout(() => {
-      history.deleteRange({startTime: new Date().getTime() - 30000, endTime: new Date().getTime() + 10000}, () => {
-        console.log('History cleared');
+    setTimeout( () => {
+      chrome.history.deleteRange({startTime: new Date().getTime() - 15000, endTime: new Date().getTime() + 10000}, x => {
+        console.log('removed some history');
+        console.log(x);
       });
-    }, 4000);
-    
-    storage.set({[tabId]: changeInfo.url}, () => {
-      console.log('tab:url was added to local storage');
-      console.log(`${changeInfo.url} will be sent to databse`);
-    });
+    }, 5000);
 
-    fetch('http://localhost:3000/pageviews',{
-      method: 'post',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json',
-        'extension': true
-      },
-      body: JSON.stringify({url: changeInfo.url})
-    })
-    .then((response) => {
-      console.log('success!');
-      console.log(response);
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+    $.get();
   }
-});
+}); 
 
-// A tab has been closed
-tabs.onRemoved.addListener((e) => {
-  storage.remove([e.toString()])
-});
-
-// Local storage has been modified from tab closure or a new URL
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  for (key in changes) {
-    let storageChange = changes[key];
-    if (!!storageChange.oldValue) {
-      console.log(`Storage key ${key} in storage was changed from ${storageChange.oldValue} to ${storageChange.newValue}`)
-      console.log(`${storageChange.oldValue} needs to be updated to inactive in the database!`);
-    }
-  }
-});
-
-
-
-
-// History has been removed
-history.onVisitRemoved.addListener((e) => {
-  console.log('Item has been removed from history successfully');
+// handles when a tab is closed
+chrome.tabs.onRemoved.addListener(e => {
+  console.log('A tab has been closed');
   console.log(e);
 });
 
-// Keeping this here for popup:background communication
-chrome.extension.onConnect.addListener((port) => {
-  console.log("Connected .....");
-  port.onMessage.addListener((msg) => {
-      console.log("message recieved " + msg);
-      port.postMessage("Hi Popup.js");
-  });
+// lets us know a history item has been removed
+chrome.history.onVisitRemoved.addListener(e => {
+  console.log('Item has been removed from history successfully');
+  console.log(e);
 });
