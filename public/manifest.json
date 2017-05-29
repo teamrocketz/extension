@@ -8,6 +8,10 @@
   "browser_action": {
     "default_popup": "index.html"
   },
+  "icons": {
+    "16": "lock16.png",
+    "48": "lock48.png"
+  },
   "incognito": "split",
   "permissions": [
     "https://www.google.com/",

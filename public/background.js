@@ -49,9 +49,9 @@ tabs.onRemoved.addListener((e) => {
 // Local storage has been modified from tab closure or a new URL
 // chrome.storage.onChanged.addListener((changes, namespace) => {   // namespace unused
 chrome.storage.onChanged.addListener((changes) => {
-  changes.keys.forEach((key) => {
+  Object.keys(changes).forEach((key) => {
     const storageChange = changes[key];
-    if (!!storageChange.oldValue) {
+    if (storageChange.oldValue !== undefined) {
       console.log(`Storage key ${key} in storage was changed from ${storageChange.oldValue} to ${storageChange.newValue}`);
       console.log(`${storageChange.oldValue} needs to be updated to inactive in the database!`);
     }
