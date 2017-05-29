@@ -4,29 +4,32 @@ const storage = chrome.storage.local;
 const history = chrome.history;
 
 // A new URL has loaded in a tab
-tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url && !changeInfo.url.match('chrome\:\/\/')) {
-
+// tabs.onUpdated.addListener((tabId, changeInfo, tab) => {    // 'tab' is unused
+tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (changeInfo.url && !changeInfo.url.match('chrome://')) {
     setTimeout(() => {
-      history.deleteRange({startTime: new Date().getTime() - 30000, endTime: new Date().getTime() + 10000}, () => {
+      history.deleteRange({
+        startTime: new Date().getTime() - 30000,
+        endTime: new Date().getTime() + 10000,
+      }, () => {
         console.log('History cleared');
       });
     }, 4000);
-    
-    storage.set({[tabId]: changeInfo.url}, () => {
+
+    storage.set({ [tabId]: changeInfo.url }, () => {
       console.log('tab:url was added to local storage');
       console.log(`${changeInfo.url} will be sent to databse`);
     });
 
-    fetch('http://localhost:3000/pageviews',{
+    fetch('http://localhost:3000/pageviews', {
       method: 'post',
       credentials: 'include',
       headers: {
-        'Accept': 'application/json, text/plain, */*',
+        Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
-        'extension': true
+        extension: true,
       },
-      body: JSON.stringify({url: changeInfo.url})
+      body: JSON.stringify({ url: changeInfo.url }),
     })
     .then((response) => {
       console.log('success!');
@@ -40,22 +43,20 @@ tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 // A tab has been closed
 tabs.onRemoved.addListener((e) => {
-  storage.remove([e.toString()])
+  storage.remove([e.toString()]);
 });
 
 // Local storage has been modified from tab closure or a new URL
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  for (key in changes) {
-    let storageChange = changes[key];
+// chrome.storage.onChanged.addListener((changes, namespace) => {   // namespace unused
+chrome.storage.onChanged.addListener((changes) => {
+  changes.keys.forEach((key) => {
+    const storageChange = changes[key];
     if (!!storageChange.oldValue) {
-      console.log(`Storage key ${key} in storage was changed from ${storageChange.oldValue} to ${storageChange.newValue}`)
+      console.log(`Storage key ${key} in storage was changed from ${storageChange.oldValue} to ${storageChange.newValue}`);
       console.log(`${storageChange.oldValue} needs to be updated to inactive in the database!`);
     }
-  }
+  });
 });
-
-
-
 
 // History has been removed
 history.onVisitRemoved.addListener((e) => {
@@ -65,9 +66,9 @@ history.onVisitRemoved.addListener((e) => {
 
 // Keeping this here for popup:background communication
 chrome.extension.onConnect.addListener((port) => {
-  console.log("Connected .....");
+  console.log('Connected .....');
   port.onMessage.addListener((msg) => {
-      console.log("message recieved " + msg);
-      port.postMessage("Hi Popup.js");
+    console.log(`message recieved ${msg}`);
+    port.postMessage('Hi Popup.js');
   });
 });

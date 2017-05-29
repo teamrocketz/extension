@@ -1,0 +1,19 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "browser": true,
+    "jest/globals": true
+  },
+  "globals": {
+    "chrome": true,
+    "$": true
+  },
+  "plugins": [
+    "jest"
+  ],
+  "rules": {
+    "jest/no-identical-title": "error",
+    "jest/valid-expect": "error",
+    "import/extensions": "off"
+  },
+}
