@@ -18,14 +18,14 @@
     "history",
     "identity",
     "sessions",
+    "storage",
     "tabs",
     "http://*/*",
     "https://*/*",
     "webNavigation"
   ],
   "background": {
-    "pages": "background.html",
-    "scripts": ["background.js"],
+    "scripts":["background.js"],
     "persistent": false
   }
 }
