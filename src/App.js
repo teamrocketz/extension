@@ -8,43 +8,62 @@ class App extends Component {
     super(props)
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      loggedIn: false
     }
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePassChange = this.handlePassChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleEmailChange(e) { this.setState({ email: e.target.value }); }
   handlePassChange(e) { this.setState({ password: e.target.value }); }
 
   handleSubmit(e) {
-    console.log('sending login/auth stuff');
     e.preventDefault();
-    axios.get('http://localhost:3000/')
-      .then(res => {
-        window.console.log('succeses!');
-        window.console.log(res);
-        console.log('succeses!');
+    console.log('attempting to authenticate');
+    axios.post('http://localhost:3000/extension/login', {email: this.state.email, password: this.state.password})
+      .then((res) => {
+        console.log('User logged in!');
         console.log(res);
+        this.setState({
+          loggedIn: true
+        });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log('error:');
         console.log(err);
-      })
+      });
   }
 
   render() {
     return (
       <div className="App">
-        <div className="App-header">
-          <h2>Welcome to React</h2>
+        {this.state.loggedIn === false ? 
+        <div>
+          <div className="App-header">
+            <h2>Welcome to React</h2>
+          </div>
+          <form onSubmit={this.handleSubmit}>
+            <input type="text" 
+                   name="email" 
+                   value={this.state.email} 
+                   onChange={this.handleEmailChange} />
+            <input type="password" 
+                   name="password" 
+                   value={this.state.password} 
+                   onChange={this.handlePassChange} />
+            <button id="ilovecats" onClick={this.handleSubmit} className="submitbutton">Login</button>
+          </form>
         </div>
-        <form onSubmit={this.handleSubmit}>
-          <input type="text" name="email" value={this.state.email} onChange={this.handleEmailChange} />
-          <input type="text" name="password" value={this.state.password} onChange={this.handlePassChange} />
-          <button id="ilovecats" onClick={this.handleSubmit} className="submitbutton">Login</button>
-      </form>
+        : <div>
+            <h2>SUCCESSFUL LOGIN!</h2>
+            <p>Cool pitures of locks and stuff</p>
+            <p>We love security</p>
+            <p>And hate history</p>
+          </div>}
       </div>
+      
     );
   }
 }
