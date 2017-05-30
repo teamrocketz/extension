@@ -1,18 +1,17 @@
-console.log('hello planet, from background script');
+// https://stackoverflow.com/questions/19103183/how-to-insert-html-with-a-chrome-extensionconsole.log('hello planet, from background script');
 const tabs = chrome.tabs;
 const storage = chrome.storage.local;
 const history = chrome.history;
 
 // A new URL has loaded in a tab
-// tabs.onUpdated.addListener((tabId, changeInfo, tab) => {    // 'tab' is unused
-tabs.onUpdated.addListener((tabId, changeInfo) => {
+tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url && !changeInfo.url.match('chrome://')) {
     setTimeout(() => {
       history.deleteRange({
         startTime: new Date().getTime() - 30000,
         endTime: new Date().getTime() + 10000,
       }, () => {
-        console.log('History cleared');
+        console.log('-----History cleared-----');
       });
     }, 4000);
 
@@ -21,7 +20,7 @@ tabs.onUpdated.addListener((tabId, changeInfo) => {
       console.log(`${changeInfo.url} will be sent to databse`);
     });
 
-    fetch('http://localhost:3000/pageviews', {
+    fetch('http://localhost:3000/pageviews/visitpage', {
       method: 'post',
       credentials: 'include',
       headers: {
@@ -29,7 +28,7 @@ tabs.onUpdated.addListener((tabId, changeInfo) => {
         'Content-Type': 'application/json',
         extension: true,
       },
-      body: JSON.stringify({ url: changeInfo.url }),
+      body: JSON.stringify({ url: changeInfo.url, title: tab.title }),
     })
     .then((response) => {
       console.log('success!');
@@ -54,6 +53,24 @@ chrome.storage.onChanged.addListener((changes) => {
     if (storageChange.oldValue !== undefined) {
       console.log(`Storage key ${key} in storage was changed from ${storageChange.oldValue} to ${storageChange.newValue}`);
       console.log(`${storageChange.oldValue} needs to be updated to inactive in the database!`);
+
+      fetch('http://localhost:3000/pageviews/deactivate', {
+        method: 'post',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/json',
+          extension: true,
+        },
+        body: JSON.stringify({ url: storageChange.oldValue }),
+      })
+      .then((response) => {
+        console.log(`${storageChange.oldValue} Updated to inactive in DB`);
+        console.log(response);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
     }
   });
 });
