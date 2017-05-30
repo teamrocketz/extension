@@ -16,6 +16,20 @@ class App extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentWillMount() {
+    axios.get('http://localhost:3000/extension/log')
+    .then((res) => {
+      if (res.status === 200) {
+        this.setState({
+          loggedIn: true,
+        });
+      }
+    })
+    .catch((err) => {
+      console.error(err, 'Not logged in');
+    });
+  }
+
   handleEmailChange(e) { this.setState({ email: e.target.value }); }
   handlePassChange(e) { this.setState({ password: e.target.value }); }
 
