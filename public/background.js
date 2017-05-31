@@ -15,11 +15,6 @@ tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       });
     }, 4000);
 
-    storage.set({ [tabId]: changeInfo.url }, () => {
-      console.log('tab:url was added to local storage');
-      console.log(`${changeInfo.url} will be sent to databse`);
-    });
-
     fetch('http://localhost:3000/pageviews/visitpage', {
       method: 'post',
       credentials: 'include',
@@ -30,9 +25,14 @@ tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       },
       body: JSON.stringify({ url: changeInfo.url, title: tab.title }),
     })
-    .then((response) => {
-      console.log('success!');
-      console.log(response);
+    .then(response =>
+      response.json(),
+    )
+    .then((data) => {
+      storage.set({ [tabId]: { url: changeInfo.url, DBid: data.id } }, () => {
+        console.log(`[${tabId}]: { url: ${changeInfo.url}, DBid: ${data.id} } ...NOW IN LOCAL STORAGE`);
+        console.log(`${changeInfo.url} will be sent to databse`);
+      });
     })
     .catch((err) => {
       console.error(err);
@@ -51,9 +51,6 @@ chrome.storage.onChanged.addListener((changes) => {
   Object.keys(changes).forEach((key) => {
     const storageChange = changes[key];
     if (storageChange.oldValue !== undefined) {
-      console.log(`Storage key ${key} in storage was changed from ${storageChange.oldValue} to ${storageChange.newValue}`);
-      console.log(`${storageChange.oldValue} needs to be updated to inactive in the database!`);
-
       fetch('http://localhost:3000/pageviews/deactivate', {
         method: 'post',
         credentials: 'include',
@@ -62,11 +59,10 @@ chrome.storage.onChanged.addListener((changes) => {
           'Content-Type': 'application/json',
           extension: true,
         },
-        body: JSON.stringify({ url: storageChange.oldValue }),
+        body: JSON.stringify({ url: storageChange.oldValue.url, id: storageChange.oldValue.DBid }),
       })
-      .then((response) => {
-        console.log(`${storageChange.oldValue} Updated to inactive in DB`);
-        console.log(response);
+      .then(() => {
+        console.log(`${storageChange.oldValue.url} Updated to inactive in DB`);
       })
       .catch((err) => {
         console.error(err);
@@ -76,9 +72,9 @@ chrome.storage.onChanged.addListener((changes) => {
 });
 
 // History has been removed
-history.onVisitRemoved.addListener((e) => {
+history.onVisitRemoved.addListener(() => {
   console.log('Item has been removed from history successfully');
-  console.log(e);
+  // console.log(event);
 });
 
 // Keeping this here for popup:background communication
