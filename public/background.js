@@ -5,7 +5,7 @@ const history = chrome.history;
 
 // A new URL has loaded in a tab
 tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url && !changeInfo.url.match('chrome://')) {
+  if (changeInfo.url && (!changeInfo.url.match('chrome://') && !changeInfo.url.match('localhost:'))) {
     setTimeout(() => {
       history.deleteRange({
         startTime: new Date().getTime() - 30000,
