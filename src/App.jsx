@@ -1,5 +1,6 @@
-import axios from 'axios';
 import React, { Component } from 'react';
+import axios from 'axios';
+import utils from './utils';
 import './App.css';
 
 class App extends Component {
@@ -9,16 +10,18 @@ class App extends Component {
       email: '',
       password: '',
       loggedIn: false,
+      session: null,
     };
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePassChange = this.handlePassChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   componentWillMount() {
     axios.get('http://localhost:3000/extension/log')
-    .then((res) => {
-      if (res.status === 200) {
+    .then((response) => {
+      if (response.status !== 404) {
         this.setState({
           loggedIn: true,
         });
@@ -29,23 +32,35 @@ class App extends Component {
     });
   }
 
+
+  logout() {
+    axios.get('http://localhost:3000/extension/logout')
+    .then((response) => {
+      if (response.status !== 404) {
+        this.setState({
+          loggedIn: false,
+        });
+      }
+    });
+  }
+
   handleEmailChange(e) { this.setState({ email: e.target.value }); }
   handlePassChange(e) { this.setState({ password: e.target.value }); }
 
   handleSubmit(e) {
     e.preventDefault();
-    console.log('attempting to authenticate');
     axios.post('http://localhost:3000/extension/login', { email: this.state.email, password: this.state.password })
-      .then((res) => {
-        console.log('User logged in!');
-        console.log(res);
-        this.setState({
-          loggedIn: true,
-        });
+      .then((response) => {
+        if (response.status !== 404) {
+          this.setState({
+            loggedIn: true,
+            password: '',
+          });
+          utils.loadSession();
+        }
       })
       .catch((err) => {
-        console.log('error:');
-        console.log(err);
+        console.error(err);
       });
   }
 
@@ -81,6 +96,8 @@ class App extends Component {
             <p>Cool pitures of locks and stuff</p>
             <p>We love security</p>
             <p>And hate history</p>
+            <button id="restore-session" onClick={utils.loadSession}>Restore Last Session</button>
+            <button id="logout" onClick={this.logout}>Logout</button>
           </div>}
       </div>
     );
