@@ -7,7 +7,7 @@ let config;
 
 // ------extension production/development routes------
 const dev = 'http://localhost:3000/';
-const prod = 'http://mystery.lolz.com/hireMe.gov?=edu+love+codez';
+const prod = 'https://hault.herokuapp.com/';
 
 chrome.management.getSelf((result) => {
   if (result.installType === 'development') {
