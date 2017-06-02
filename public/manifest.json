@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "Demo React-Chrome extension",
-  "description": "This extension shows how to run a React app as a Chrome extension",
+  "name": "Hault",
+  "description": "Secure history. Anonymous Browsing. Persistent Sessions.",
   "version": "1.0",
 
   "browser_action": {
@@ -29,7 +29,7 @@
     "webNavigation"
   ],
   "background": {
-    "scripts":["background.js"],
+    "scripts":["listener.js", "background.js"],
     "persistent": false
   }
 }
