@@ -21,7 +21,8 @@ class App extends Component {
   componentWillMount() {
     axios.get('http://localhost:3000/extension/log')
     .then((response) => {
-      if (response.status !== 404) {
+      console.log(response);
+      if (response.status === 200) {
         this.setState({
           loggedIn: true,
         });
@@ -70,7 +71,7 @@ class App extends Component {
         {!this.state.loggedIn ?
           <div>
             <div className="App-header">
-              <h2>Welcome to React</h2>
+              <button onClick={utils.openVault}>Welcome to Hault</button>
             </div>
             <form onSubmit={this.handleSubmit}>
               <input
@@ -93,6 +94,7 @@ class App extends Component {
         :
           <div>
             <h2>SUCCESSFUL LOGIN!</h2>
+            <button onClick={utils.openVault}>Welcome to Hault</button>
             <p>Cool pitures of locks and stuff</p>
             <p>We love security</p>
             <p>And hate history</p>

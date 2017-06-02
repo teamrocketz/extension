@@ -2,10 +2,17 @@
 const tabs = chrome.tabs;
 const storage = chrome.storage.local;
 const history = chrome.history;
+const windows = chrome.windows;
 
-// A new URL has loaded in a tab
-tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url && (!changeInfo.url.match('chrome://') && !changeInfo.url.match('localhost:'))) {
+const tabUpdate = (tabId, changeInfo, tab) => {
+  const validUpdate = tab.status === 'complete'
+                   && tab.url
+                   && !tab.url.match(tab.title)
+                   && tab.title
+                   && tab.favIconUrl
+                   && (!tab.url.match('chrome://') && !tab.url.match('localhost:'));
+
+  if (validUpdate) {
     setTimeout(() => {
       history.deleteRange({
         startTime: new Date().getTime() - 30000,
@@ -23,65 +30,95 @@ tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         'Content-Type': 'application/json',
         extension: true,
       },
-      body: JSON.stringify({ url: changeInfo.url, title: tab.title }),
+      body: JSON.stringify({
+        url: tab.url,
+        title: tab.title,
+        icon: tab.favIconUrl,
+      }),
     })
     .then(response =>
       response.json(),
     )
     .then((data) => {
-      storage.set({ [tabId]: { url: changeInfo.url, DBid: data.id } }, () => {
-        console.log(`[${tabId}]: { url: ${changeInfo.url}, DBid: ${data.id} } ...NOW IN LOCAL STORAGE`);
-        console.log(`${changeInfo.url} will be sent to databse`);
+      storage.set({ [tabId]: { url: tab.url, DBid: data.id } }, () => {
+        console.log(`[${tabId}]: { url: ${tab.url}, DBid: ${data.id} } ...NOW IN LOCAL STORAGE`);
+        console.log(`${tab.url} will be sent to databse`);
       });
     })
     .catch((err) => {
       console.error(err);
     });
   }
-});
+};
 
-// A tab has been closed
-tabs.onRemoved.addListener((e) => {
+const tabRemoved = (e) => {
+  console.log('TAB REMOVED');
   storage.remove([e.toString()]);
-});
+};
 
-// Local storage has been modified from tab closure or a new URL
-// chrome.storage.onChanged.addListener((changes, namespace) => {   // namespace unused
-chrome.storage.onChanged.addListener((changes) => {
-  Object.keys(changes).forEach((key) => {
-    const storageChange = changes[key];
-    if (storageChange.oldValue !== undefined) {
-      fetch('http://localhost:3000/pageviews/deactivate', {
-        method: 'post',
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/json',
-          extension: true,
-        },
-        body: JSON.stringify({ url: storageChange.oldValue.url, id: storageChange.oldValue.DBid }),
-      })
-      .then(() => {
-        console.log(`${storageChange.oldValue.url} Updated to inactive in DB`);
-      })
-      .catch((err) => {
-        console.error(err);
+const storageChanged = (changes) => {
+  windows.getAll((browsers) => {
+    if (browsers.length > 0) {
+      Object.keys(changes).forEach((key) => {
+        const storageChange = changes[key];
+        if (storageChange.oldValue !== undefined) {
+          console.log('local stoarge has chagned');
+          fetch('http://localhost:3000/pageviews/deactivate', {
+            method: 'post',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json, text/plain, */*',
+              'Content-Type': 'application/json',
+              extension: true,
+            },
+            body: JSON.stringify({
+              url: storageChange.oldValue.url,
+              id: storageChange.oldValue.DBid,
+            }),
+          })
+          .then(() => {
+            console.log(`${storageChange.oldValue.url} Updated to inactive in DB`);
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+        }
       });
     }
   });
-});
+};
+
+
+// A new URL has loaded in a tab
+tabs.onUpdated.addListener(tabUpdate);
+
+// A tab has been closed
+tabs.onRemoved.addListener(tabRemoved);
+
+// Storage has been edited
+chrome.storage.onChanged.addListener(storageChanged);
 
 // History has been removed
 history.onVisitRemoved.addListener(() => {
   console.log('Item has been removed from history successfully');
-  // console.log(event);
 });
 
-// Keeping this here for popup:background communication
-chrome.extension.onConnect.addListener((port) => {
-  console.log('Connected .....');
-  port.onMessage.addListener((msg) => {
-    console.log(`message recieved ${msg}`);
-    port.postMessage('Hi Popup.js');
+
+// A new window has been opened
+windows.onCreated.addListener(() => {
+  windows.getAll((browsers) => {
+    if (browsers.length === 1) {
+      console.log('first window opened, adding storage event listener');
+      chrome.storage.onChanged.addListener(storageChanged);
+    }
   });
 });
+
+// Please keep this here for popup:background communication
+// chrome.extension.onConnect.addListener((port) => {
+//   console.log('Connected .....');
+//   port.onMessage.addListener((msg) => {
+//     console.log(`message recieved ${msg}`);
+//     port.postMessage('Hi Popup.js');
+//   });
+// });
