@@ -3,11 +3,25 @@ const tabs = chrome.tabs;
 const storage = chrome.storage.local;
 const history = chrome.history;
 const windows = chrome.windows;
+let config;
+
+// ------extension production/development routes------
+const dev = 'http://localhost:3000/';
+const prod = 'http://mystery.lolz.com/hireMe.gov?=edu+love+codez';
+
+chrome.management.getSelf((result) => {
+  if (result.installType === 'development') {
+    config = dev;
+  } else {
+    config = prod;
+  }
+});
+// ------extension production/development routes------
 
 const tabUpdate = (tabId, changeInfo, tab) => {
   const validUpdate = tab.status === 'complete'
                    && tab.url
-                   && !tab.url.match(tab.title)
+                   // && !tab.url.match(tab.title)
                    && tab.title
                    && tab.favIconUrl
                    && (!tab.url.match('chrome://') && !tab.url.match('localhost:'));
@@ -22,7 +36,7 @@ const tabUpdate = (tabId, changeInfo, tab) => {
       });
     }, 4000);
 
-    fetch('http://localhost:3000/pageviews/visitpage', {
+    fetch(`${config}pageviews/visitpage`, {
       method: 'post',
       credentials: 'include',
       headers: {
@@ -63,7 +77,7 @@ const storageChanged = (changes) => {
         const storageChange = changes[key];
         if (storageChange.oldValue !== undefined) {
           console.log('local stoarge has chagned');
-          fetch('http://localhost:3000/pageviews/deactivate', {
+          fetch(`${config}pageviews/deactivate`, {
             method: 'post',
             credentials: 'include',
             headers: {
@@ -114,7 +128,8 @@ windows.onCreated.addListener(() => {
   });
 });
 
-// Please keep this here for popup:background communication
+
+// // Please keep this here for popup:background communication
 // chrome.extension.onConnect.addListener((port) => {
 //   console.log('Connected .....');
 //   port.onMessage.addListener((msg) => {

@@ -29,7 +29,9 @@
     "webNavigation"
   ],
   "background": {
-    "scripts":["listener.js", "background.js"],
+    "scripts":[
+               "background.js"
+             ],
     "persistent": false
   }
 }
