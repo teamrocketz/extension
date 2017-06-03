@@ -19,6 +19,15 @@ chrome.management.getSelf((result) => {
 // ------extension production/development routes------
 
 const tabUpdate = (tabId, changeInfo, tab) => {
+  setTimeout(() => {
+    history.deleteRange({
+      startTime: new Date().getTime() - 30000,
+      endTime: new Date().getTime() + 10000,
+    }, () => {
+      console.log('-----History cleared-----');
+    });
+  }, 4000);
+
   const validUpdate = tab.status === 'complete'
                    && !tab.title.match(' messaged you') // Could pair this with url matching facebook
                    && (!tab.url.match('chrome://') && !tab.url.match('localhost:'))
@@ -27,15 +36,6 @@ const tabUpdate = (tabId, changeInfo, tab) => {
                    && tab.favIconUrl;
                    // && !tab.url.match(tab.title)
   if (validUpdate) {
-    setTimeout(() => {
-      history.deleteRange({
-        startTime: new Date().getTime() - 30000,
-        endTime: new Date().getTime() + 10000,
-      }, () => {
-        console.log('-----History cleared-----');
-      });
-    }, 4000);
-
     fetch(`${config}pageviews/visitpage`, {
       method: 'post',
       credentials: 'include',
