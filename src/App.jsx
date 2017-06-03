@@ -11,6 +11,7 @@ class App extends Component {
       password: '',
       loggedIn: false,
       session: null,
+      address: 'http://localhost:3000/',
     };
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePassChange = this.handlePassChange.bind(this);
@@ -19,9 +20,8 @@ class App extends Component {
   }
 
   componentWillMount() {
-    axios.get('http://localhost:3000/extension/log')
+    axios.get(`${this.state.address}extension/log`)
     .then((response) => {
-      console.log(response);
       if (response.status === 200) {
         this.setState({
           loggedIn: true,
@@ -35,7 +35,7 @@ class App extends Component {
 
 
   logout() {
-    axios.get('http://localhost:3000/extension/logout')
+    axios.get(`${this.state.address}extension/logout`)
     .then((response) => {
       if (response.status !== 404) {
         this.setState({
@@ -50,7 +50,7 @@ class App extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    axios.post('http://localhost:3000/extension/login', { email: this.state.email, password: this.state.password })
+    axios.post(`${this.state.address}extension/login`, { email: this.state.email, password: this.state.password })
       .then((response) => {
         if (response.status !== 404) {
           this.setState({
