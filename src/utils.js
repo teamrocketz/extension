@@ -13,6 +13,6 @@ module.exports.loadSession = () => {
 };
 
 
-module.exports.openVault = () => {
-  window.open('http://localhost:3000/', '_blank');
-};
+// module.exports.openVault = () => {
+//   window.open('http://localhost:3000/', '_blank');
+// };
