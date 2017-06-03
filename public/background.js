@@ -20,12 +20,12 @@ chrome.management.getSelf((result) => {
 
 const tabUpdate = (tabId, changeInfo, tab) => {
   const validUpdate = tab.status === 'complete'
+                   && !tab.title.match(' messaged you') // Could pair this with url matching facebook
+                   && (!tab.url.match('chrome://') && !tab.url.match('localhost:'))
                    && tab.url
-                   // && !tab.url.match(tab.title)
                    && tab.title
-                   && tab.favIconUrl
-                   && (!tab.url.match('chrome://') && !tab.url.match('localhost:'));
-
+                   && tab.favIconUrl;
+                   // && !tab.url.match(tab.title)
   if (validUpdate) {
     setTimeout(() => {
       history.deleteRange({
@@ -54,10 +54,14 @@ const tabUpdate = (tabId, changeInfo, tab) => {
       response.json(),
     )
     .then((data) => {
-      storage.set({ [tabId]: { url: tab.url, DBid: data.id } }, () => {
-        console.log(`[${tabId}]: { url: ${tab.url}, DBid: ${data.id} } ...NOW IN LOCAL STORAGE`);
-        console.log(`${tab.url} will be sent to databse`);
-      });
+      if (!data.err) {
+        storage.set({ [tabId]: { url: tab.url, DBid: data.id } }, () => {
+          console.log(`[${tabId}]: { url: ${tab.url}, DBid: ${data.id} } ...NOW IN LOCAL STORAGE`);
+          console.log(`${tab.url} will be sent to databse`);
+        });
+      } else {
+        console.log('Duplicate entry, local storage unchanged');
+      }
     })
     .catch((err) => {
       console.error(err);
@@ -112,10 +116,10 @@ tabs.onRemoved.addListener(tabRemoved);
 // Storage has been edited
 chrome.storage.onChanged.addListener(storageChanged);
 
-// History has been removed
-history.onVisitRemoved.addListener(() => {
-  console.log('Item has been removed from history successfully');
-});
+// // History has been removed
+// history.onVisitRemoved.addListener(() => {
+//   console.log('Item has been removed from history successfully');
+// });
 
 
 // A new window has been opened
@@ -127,7 +131,6 @@ windows.onCreated.addListener(() => {
     }
   });
 });
-
 
 // // Please keep this here for popup:background communication
 // chrome.extension.onConnect.addListener((port) => {
