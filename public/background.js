@@ -17,6 +17,13 @@ chrome.management.getSelf((result) => {
   }
 });
 // ------extension production/development routes------
+const scrapeHTML = (tabId, changeInfo, tab) => {
+  if (tab.id) {
+    chrome.tabs.executeScript(tab.id, {
+      file: scraper.js, // eslint-disable-line no-undef
+    });
+  }
+};
 
 const tabUpdate = (tabId, changeInfo, tab) => {
   setTimeout(() => {
@@ -109,6 +116,7 @@ const storageChanged = (changes) => {
 
 // A new URL has loaded in a tab
 tabs.onUpdated.addListener(tabUpdate);
+tabs.onUpdated.addListener(scrapeHTML);
 
 // A tab has been closed
 tabs.onRemoved.addListener(tabRemoved);
