@@ -97,13 +97,12 @@ class App extends Component {
           </div>
         :
           <div>
-            <h2>SUCCESSFUL LOGIN!</h2>
             <a
               href={this.state.address}
               rel="noopener noreferrer"
               target="_blank"
             >
-              Welcome to Hault </a>
+              My Vault </a>
             <p>Cool pitures of locks and stuff</p>
             <p>We love security</p>
             <p>And hate history</p>
