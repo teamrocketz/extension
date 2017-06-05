@@ -21,8 +21,8 @@ chrome.management.getSelf((result) => {
 const tabUpdate = (tabId, changeInfo, tab) => {
   setTimeout(() => {
     history.deleteRange({
-      startTime: new Date().getTime() - 30000,
-      endTime: new Date().getTime() + 10000,
+      startTime: Date.now() - 30000,
+      endTime: Date.now() + 10000,
     }, () => {
       console.log('-----History cleared-----');
     });
@@ -30,7 +30,7 @@ const tabUpdate = (tabId, changeInfo, tab) => {
 
   const validUpdate = tab.status === 'complete'
                    && !tab.title.match(' messaged you') // Could pair this with url matching facebook
-                   && (!tab.url.match('chrome://') && !tab.url.match('localhost:'))
+                   && (!tab.url.match('chrome://') && !tab.url.match('localhost:') && !tab.url.match('about://'))
                    && tab.url
                    && tab.title
                    && tab.favIconUrl;
