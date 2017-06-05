@@ -71,7 +71,11 @@ class App extends Component {
         {!this.state.loggedIn ?
           <div>
             <div className="App-header">
-              <button onClick={utils.openVault}>Welcome to Hault</button>
+              <a
+                href={this.state.address}
+                rel="noopener noreferrer"
+                target="_blank"
+              >Welcome to Hault </a>
             </div>
             <form onSubmit={this.handleSubmit}>
               <input
@@ -93,8 +97,12 @@ class App extends Component {
           </div>
         :
           <div>
-            <h2>SUCCESSFUL LOGIN!</h2>
-            <button onClick={utils.openVault}>Welcome to Hault</button>
+            <a
+              href={this.state.address}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              My Vault </a>
             <p>Cool pitures of locks and stuff</p>
             <p>We love security</p>
             <p>And hate history</p>
