@@ -17,6 +17,18 @@ chrome.management.getSelf((result) => {
   }
 });
 // ------extension production/development routes------
+
+const snippets = {};
+const sendSnippet = (page) => {
+  if (page.snippet.length > 0) {
+    console.log(Object.keys(snippets).length);
+    console.log(page.snippet);
+    snippets[page.url] = page.snippet;
+  } else {
+    snippets[page.url] = '';
+  }
+};
+
 const scrapeHTML = (tabId, changeInfo, tab) => {
   if (tab.id) {
     chrome.tabs.executeScript(tab.id, {
@@ -24,6 +36,7 @@ const scrapeHTML = (tabId, changeInfo, tab) => {
     });
   }
 };
+
 
 const tabUpdate = (tabId, changeInfo, tab) => {
   setTimeout(() => {
@@ -41,8 +54,13 @@ const tabUpdate = (tabId, changeInfo, tab) => {
                    && tab.url
                    && tab.title
                    && tab.favIconUrl;
+                   // && snippets[tab.url] !== undefined;
                    // && !tab.url.match(tab.title)
   if (validUpdate) {
+    console.log(tab.id);
+    console.log(tab.id);
+    console.log(tab.id);
+    console.log(tab.id);
     fetch(`${config}pageviews/visitpage`, {
       method: 'post',
       credentials: 'include',
@@ -55,13 +73,16 @@ const tabUpdate = (tabId, changeInfo, tab) => {
         url: tab.url,
         title: tab.title,
         icon: tab.favIconUrl,
+        snippet: snippets[tab.url],
       }),
     })
     .then(response =>
       response.json(),
     )
     .then((data) => {
+      delete snippets[tab.url];
       if (!data.err) {
+        delete snippets[tab.url];
         storage.set({ [tabId]: { url: tab.url, DBid: data.id } }, () => {
           console.log(`[${tabId}]: { url: ${tab.url}, DBid: ${data.id} } ...NOW IN LOCAL STORAGE`);
           console.log(`${tab.url} will be sent to databse`);
@@ -87,7 +108,6 @@ const storageChanged = (changes) => {
       Object.keys(changes).forEach((key) => {
         const storageChange = changes[key];
         if (storageChange.oldValue !== undefined) {
-          console.log('local stoarge has chagned');
           fetch(`${config}pageviews/deactivate`, {
             method: 'post',
             credentials: 'include',
@@ -124,6 +144,9 @@ tabs.onRemoved.addListener(tabRemoved);
 // Storage has been edited
 chrome.storage.onChanged.addListener(storageChanged);
 
+// // A message has been received from scraper.js
+chrome.runtime.onMessage.addListener(sendSnippet);
+
 // // History has been removed
 // history.onVisitRemoved.addListener(() => {
 //   console.log('Item has been removed from history successfully');
@@ -142,9 +165,8 @@ windows.onCreated.addListener(() => {
 
 // // Please keep this here for popup:background communication
 // chrome.extension.onConnect.addListener((port) => {
-//   console.log('Connected .....');
 //   port.onMessage.addListener((msg) => {
-//     console.log(`message recieved ${msg}`);
-//     port.postMessage('Hi Popup.js');
+//     console.log(msg);
 //   });
 // });
+
