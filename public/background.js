@@ -8,7 +8,6 @@ let config;
 // ------extension production/development routes------
 const dev = 'http://localhost:3000/';
 const prod = 'https://hault.herokuapp.com/';
-
 chrome.management.getSelf((result) => {
   if (result.installType === 'development') {
     config = dev;
@@ -18,14 +17,9 @@ chrome.management.getSelf((result) => {
 });
 // ------extension production/development routes------
 
-const snippets = {};
-const sendSnippet = (page) => {
-  if (page.snippet.length > 0) {
-    console.log(Object.keys(snippets).length);
-    console.log(page.snippet);
-    snippets[page.url] = page.snippet;
-  } else {
-    snippets[page.url] = '';
+const storeSnippet = (page) => {
+  if (page.snippet) {
+    storage.set({ [page.url]: page.snippet });
   }
 };
 
@@ -36,7 +30,6 @@ const scrapeHTML = (tabId, changeInfo, tab) => {
     });
   }
 };
-
 
 const tabUpdate = (tabId, changeInfo, tab) => {
   setTimeout(() => {
@@ -54,13 +47,8 @@ const tabUpdate = (tabId, changeInfo, tab) => {
                    && tab.url
                    && tab.title
                    && tab.favIconUrl;
-                   // && snippets[tab.url] !== undefined;
                    // && !tab.url.match(tab.title)
   if (validUpdate) {
-    console.log(tab.id);
-    console.log(tab.id);
-    console.log(tab.id);
-    console.log(tab.id);
     fetch(`${config}pageviews/visitpage`, {
       method: 'post',
       credentials: 'include',
@@ -73,22 +61,16 @@ const tabUpdate = (tabId, changeInfo, tab) => {
         url: tab.url,
         title: tab.title,
         icon: tab.favIconUrl,
-        snippet: snippets[tab.url],
       }),
     })
     .then(response =>
       response.json(),
     )
     .then((data) => {
-      delete snippets[tab.url];
       if (!data.err) {
-        delete snippets[tab.url];
         storage.set({ [tabId]: { url: tab.url, DBid: data.id } }, () => {
-          console.log(`[${tabId}]: { url: ${tab.url}, DBid: ${data.id} } ...NOW IN LOCAL STORAGE`);
-          console.log(`${tab.url} will be sent to databse`);
+          console.log(`${tab.url} will to be added to databse`);
         });
-      } else {
-        console.log('Duplicate entry, local storage unchanged');
       }
     })
     .catch((err) => {
@@ -98,34 +80,38 @@ const tabUpdate = (tabId, changeInfo, tab) => {
 };
 
 const tabRemoved = (e) => {
-  console.log('TAB REMOVED');
   storage.remove([e.toString()]);
 };
 
 const storageChanged = (changes) => {
-  windows.getAll((browsers) => {
+  windows.getAll({}, (browsers) => {
     if (browsers.length > 0) {
       Object.keys(changes).forEach((key) => {
-        const storageChange = changes[key];
-        if (storageChange.oldValue !== undefined) {
-          fetch(`${config}pageviews/deactivate`, {
-            method: 'post',
-            credentials: 'include',
-            headers: {
-              Accept: 'application/json, text/plain, */*',
-              'Content-Type': 'application/json',
-              extension: true,
-            },
-            body: JSON.stringify({
-              url: storageChange.oldValue.url,
-              id: storageChange.oldValue.DBid,
-            }),
-          })
-          .then(() => {
-            console.log(`${storageChange.oldValue.url} Updated to inactive in DB`);
-          })
-          .catch((err) => {
-            console.error(err);
+        const storageChange = changes[key].oldValue;
+        if (storageChange !== undefined) {
+          const url = storageChange.url;
+
+          storage.get([url], (result) => {
+            const snippet = result[url];
+            storage.remove([url]);
+
+            fetch(`${config}pageviews/deactivate`, {
+              method: 'post',
+              credentials: 'include',
+              headers: {
+                Accept: 'application/json, text/plain, */*',
+                'Content-Type': 'application/json',
+                extension: true,
+              },
+              body: JSON.stringify({
+                url,
+                id: storageChange.DBid,
+                snippet,
+              }),
+            })
+            .catch((err) => {
+              console.error(err);
+            });
           });
         }
       });
@@ -136,6 +122,8 @@ const storageChanged = (changes) => {
 
 // A new URL has loaded in a tab
 tabs.onUpdated.addListener(tabUpdate);
+
+// A new URL has loaded, creates snippet to be sent later.
 tabs.onUpdated.addListener(scrapeHTML);
 
 // A tab has been closed
@@ -145,28 +133,4 @@ tabs.onRemoved.addListener(tabRemoved);
 chrome.storage.onChanged.addListener(storageChanged);
 
 // // A message has been received from scraper.js
-chrome.runtime.onMessage.addListener(sendSnippet);
-
-// // History has been removed
-// history.onVisitRemoved.addListener(() => {
-//   console.log('Item has been removed from history successfully');
-// });
-
-
-// A new window has been opened
-windows.onCreated.addListener(() => {
-  windows.getAll((browsers) => {
-    if (browsers.length === 1) {
-      console.log('first window opened, adding storage event listener');
-      chrome.storage.onChanged.addListener(storageChanged);
-    }
-  });
-});
-
-// // Please keep this here for popup:background communication
-// chrome.extension.onConnect.addListener((port) => {
-//   port.onMessage.addListener((msg) => {
-//     console.log(msg);
-//   });
-// });
-
+chrome.runtime.onMessage.addListener(storeSnippet);
