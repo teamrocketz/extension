@@ -14,6 +14,7 @@
   },
   "incognito": "split",
   "permissions": [
+    "activeTab",
     "https://www.google.com/",
     "background",
     "browsingData",
@@ -27,6 +28,12 @@
     "http://*/*",
     "https://*/*",
     "webNavigation"
+  ],
+  "content_scripts": [
+    {
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["scraper.js"]
+    }
   ],
   "background": {
     "scripts":[
