@@ -8,12 +8,14 @@
   const longestElement = filteredTextNodes.pop();
   let snippet = '';
 
-  if (longestElement.length > 1000) {
-    snippet = longestElement.slice(0, 1000);
-  } else if (longestElement.length > 800 && longestElement.length < 1000) {
-    snippet = longestElement;
-  } else {
-    snippet = filteredTextNodes.join(' ').slice(0, 1000);
+  if (longestElement) {
+    if (longestElement.length > 1000) {
+      snippet = longestElement.slice(0, 1000);
+    } else if (longestElement.length > 800 && longestElement.length < 1000) {
+      snippet = longestElement;
+    } else {
+      snippet = filteredTextNodes.join(' ').slice(0, 1000);
+    }
   }
 
   port.sendMessage({
