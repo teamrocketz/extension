@@ -1,3 +1,16 @@
+html, body {
+  background-color: #09121b;
+  border: 0;
+  margin: 0;
+}
+.form-group {
+  margin: auto;
+}
+
+.center-block {
+  margin-top: 35%;
+}
+
 .App {
   text-align: center;
 }
@@ -8,10 +21,13 @@
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
+  background: url('./background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  display: table;
+  height: 275px;
+  width: 100%;
   color: white;
+  border-bottom: 1px solid white;
 }
 
 .App-intro {
@@ -32,6 +48,78 @@ body {
   font-family: sans-serif;
 
   /* Added body dimensions */
-  height: 300px;
+  height: 350px;
   width: 250px;
 }
+
+input {
+  margin: auto;
+}
+
+
+.btn-hault {
+  background-color: #FF5722;
+  border: 0px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+.btn-hault:hover {
+ background-color: #607D8B;
+ color: #212121;
+}
+
+.form-group {
+  background-color: #455A64;
+  padding-top: 5px;
+}
+
+.form-control {
+  height: 30px;
+  width: 65%;
+  margin: auto;
+}
+
+.navbar-fixed-bottom {
+  width: 100%;
+}
+
+.logout {
+  border-radius: 0;
+  border-left: 1px solid #09121b;
+  height: 50px;
+  margin: 0;
+  width: 50%;
+  background-color: #FF5722;
+}
+.logout:hover {
+  border: 1px solid #fd8762;
+  background-color: #CFD8DC;
+}
+
+.session {
+  border-radius: 0;
+  border-right: 1px solid #09121b;
+  height: 50px;
+  margin: 0;
+  width: 50%;
+  background-color: #fd8762;
+}
+.session:hover {
+  border: 1px solid #FF5722;
+  background-color: #CFD8DC;
+}
+
+.browse {
+  color: #BDBDBD;
+}
+
+
+.dark-primary-color    { background: #455A64; }
+.default-primary-color { background: #607D8B; }
+.light-primary-color   { background: #CFD8DC; }
+.text-primary-color    { color: #FFFFFF; }
+.accent-color          { background: #FF5722; }
+.primary-text-color    { color: #212121; }
+.secondary-text-color  { color: #757575; }
+.divider-color         { border-color: #BDBDBD; }

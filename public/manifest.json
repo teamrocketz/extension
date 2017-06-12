@@ -36,7 +36,7 @@
     }
   ],
   "background": {
-    "scripts":[
+    "scripts":[ "bootstrap.min.js",
                "background.js"
              ],
     "persistent": false
