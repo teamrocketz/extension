@@ -1,3 +1,5 @@
+/*I don't know why but this css isn't being applied/doesn't matter*/
+
 body {
   margin: 0;
   padding: 0;
@@ -7,3 +9,30 @@ body {
   height: 300px;
   width: 250px;
 }
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto', sans-serif;
+}
+
+.btn-hault {
+  background-color: #FF5722;
+  border: 0px;
+}
+.btn-hault:hover {
+ background-color: #607D8B;
+ color: #212121;
+}
+
+.form-group {
+  background-color: red;
+}
+
+
+.dark-primary-color    { background: #455A64; }
+.default-primary-color { background: #607D8B; }
+.light-primary-color   { background: #CFD8DC; }
+.text-primary-color    { color: #FFFFFF; }
+.accent-color          { background: #FF5722; }
+.primary-text-color    { color: #212121; }
+.secondary-text-color  { color: #757575; }
+.divider-color         { border-color: #BDBDBD; }
