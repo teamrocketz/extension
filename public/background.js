@@ -1,4 +1,3 @@
-// https://stackoverflow.com/questions/19103183/how-to-insert-html-with-a-chrome-extensionconsole.log('hello planet, from background script');
 const tabs = chrome.tabs;
 const storage = chrome.storage.local;
 const history = chrome.history;
@@ -31,7 +30,7 @@ const scrapeHTML = (tabId, changeInfo, tab) => {
   }
 };
 
-const tabUpdate = (tabId, changeInfo, tab) => {
+const clearHistory = () => {
   setTimeout(() => {
     history.deleteRange({
       startTime: Date.now() - 30000,
@@ -40,14 +39,16 @@ const tabUpdate = (tabId, changeInfo, tab) => {
       console.log('-----History cleared-----');
     });
   }, 4000);
+};
 
+const tabUpdate = (tabId, changeInfo, tab) => {
   const validUpdate = tab.status === 'complete'
-                   && !tab.title.match(' messaged you') // Could pair this with url matching facebook
+                   && !tab.title.match(' messaged you')
                    && (!tab.url.match('chrome://') && !tab.url.match('localhost:') && !tab.url.match('about://'))
                    && tab.url
                    && tab.title
                    && tab.favIconUrl;
-                   // && !tab.url.match(tab.title)
+
   if (validUpdate) {
     fetch(`${config}pageviews/visitpage`, {
       method: 'post',
@@ -122,6 +123,7 @@ const storageChanged = (changes) => {
 
 // A new URL has loaded in a tab
 tabs.onUpdated.addListener(tabUpdate);
+tabs.onUpdated.addListener(clearHistory);
 
 // A new URL has loaded, creates snippet to be sent later.
 tabs.onUpdated.addListener(scrapeHTML);
