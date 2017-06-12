@@ -71,43 +71,65 @@ class App extends Component {
         {!this.state.loggedIn ?
           <div>
             <div className="App-header">
-              <a
-                href={this.state.address}
-                rel="noopener noreferrer"
-                target="_blank"
-              >Welcome to Hault </a>
+              <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                <img
+                  src="./lock48.png"
+                  alt="Hault"
+                  height="65"
+                  className="logo-ext img-responsive center-block"
+                />
+              </a>
             </div>
-            <form onSubmit={this.handleSubmit}>
-              <input
-                type="text"
-                name="email"
-                value={this.state.email}
-                onChange={this.handleEmailChange}
-              />
-              <input
-                type="password"
-                name="password"
-                value={this.state.password}
-                onChange={this.handlePassChange}
-              />
-              <button id="ilovecats" onClick={this.handleSubmit} className="submitbutton">
+            <form className="form-group" onSubmit={this.handleSubmit}>
+              <div className="form-group">
+                <input
+                  className="form-control email"
+                  type="text"
+                  name="email"
+                  value={this.state.email}
+                  onChange={this.handleEmailChange}
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  className="form-control pass"
+                  type="password"
+                  name="password"
+                  value={this.state.password}
+                  onChange={this.handlePassChange}
+                />
+              </div>
+              <button
+                id="ilovecats"
+                onClick={this.handleSubmit}
+                className="btn btn-hault submitbutton"
+              >
                 Login
               </button>
             </form>
           </div>
         :
           <div>
+            <p className="browse">You are now browsing securely.</p>
             <a
               href={this.state.address}
               rel="noopener noreferrer"
               target="_blank"
             >
               My Vault </a>
-            <p>Cool pitures of locks and stuff</p>
-            <p>We love security</p>
-            <p>And hate history</p>
-            <button id="restore-session" onClick={utils.loadSession}>Restore Last Session</button>
-            <button id="logout" onClick={this.logout}>Logout</button>
+            <div className="navbar-fixed-bottom btn-group">
+              <button
+                className="btn session"
+                id="restore-session"
+                onClick={utils.loadSession}
+              >Restore
+              Session</button>
+              <button
+                className="btn logout"
+                id="logout"
+                onClick={this.logout}
+              >Logout</button>
+            </div>
           </div>}
       </div>
     );
