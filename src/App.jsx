@@ -12,6 +12,7 @@ class App extends Component {
       loggedIn: false,
       session: null,
       address: 'http://localhost:3000/',
+      // address: 'https://hault.herokuapp.com/',
     };
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePassChange = this.handlePassChange.bind(this);
@@ -71,7 +72,7 @@ class App extends Component {
         {!this.state.loggedIn ?
           <div>
             <div className="App-header">
-              <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+              <a href={this.state.address} target="_blank" rel="noopener noreferrer">
                 <img
                   src="./lock48.png"
                   alt="Hault"
