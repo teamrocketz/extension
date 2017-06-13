@@ -88,6 +88,7 @@ class App extends Component {
                   type="text"
                   name="email"
                   value={this.state.email}
+                  placeholder="Email"
                   onChange={this.handleEmailChange}
                 />
               </div>
@@ -98,6 +99,7 @@ class App extends Component {
                   name="password"
                   value={this.state.password}
                   onChange={this.handlePassChange}
+                  placeholder="Password"
                 />
               </div>
               <button
