@@ -11,8 +11,3 @@ module.exports.loadSession = () => {
     console.error(err);
   });
 };
-
-
-// module.exports.openVault = () => {
-//   window.open('http://localhost:3000/', '_blank');
-// };
