@@ -11,8 +11,8 @@ class App extends Component {
       password: '',
       loggedIn: false,
       session: null,
-      // address: 'http://localhost:3000/',
-      address: 'https://hault.herokuapp.com/',
+      address: 'http://localhost:3000/',
+      // address: 'https://hault.herokuapp.com/',
     };
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePassChange = this.handlePassChange.bind(this);

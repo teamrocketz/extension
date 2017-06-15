@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 module.exports.loadSession = () => {
-  axios.get('https://hault.herokuapp.com/pageviews/active')
+  axios.get('http://localhost:3000/pageviews/active')
   .then(({ data }) => {
     data.forEach((page) => {
       window.open(page.url, '_blank');
