@@ -74,7 +74,7 @@ class App extends Component {
             <div className="App-header">
               <a href={this.state.address} target="_blank" rel="noopener noreferrer">
                 <img
-                  src="./lock48.png"
+                  src="./haultlogoweb.png"
                   alt="Hault"
                   height="65"
                   className="logo-ext img-responsive center-block"
@@ -113,13 +113,14 @@ class App extends Component {
           </div>
         :
           <div>
-            <p className="browse">You are now browsing securely.</p>
+            <p className="browse"><h3>You are now browsing securely.</h3></p>
             <a
               href={this.state.address}
               rel="noopener noreferrer"
               target="_blank"
+              className="link"
             >
-              My Vault </a>
+              Access History Vault </a>
             <div className="navbar-fixed-bottom btn-group">
               <button
                 className="btn session"

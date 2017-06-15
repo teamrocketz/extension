@@ -14,10 +14,19 @@ h1, h2, h3, h4, h5, h6 {
     font-family: 'Roboto', sans-serif;
 }
 
+a {
+  color: #FFFFFF;
+}
+
+.link {
+  color: #FF5722;
+}
+
 .btn-hault {
   background-color: #FF5722;
   border: 0px;
 }
+
 .btn-hault:hover {
  background-color: #607D8B;
  color: #212121;
