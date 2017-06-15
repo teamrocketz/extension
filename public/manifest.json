@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "Hault",
-  "description": "Secure history. Anonymous Browsing. Persistent Sessions.",
-  "version": "1.0",
+  "description": "Advanced History Storage. Anonymous Browsing. Persistent Sessions.",
+  "version": "1.2",
 
   "browser_action": {
     "default_popup": "index.html"
